@@ -1,0 +1,44 @@
+﻿@model TransferModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Amount</title>
+</head>
+<body>
+    <h1>Transfer Amount</h1>
+
+    <form asp-action="Transfer" method="post">
+        <div>
+            <label asp-for="From"></label>
+            <input asp-for="From" />
+        </div>
+        <div>
+            <label asp-for="To"></label>
+            <input asp-for="To" />
+        </div>
+        <div>
+            <label asp-for="Amount"></label>
+            <input asp-for="Amount" />
+        </div>
+        <div>
+            <button type="submit">Send</button>
+        </div>
+    </form>
+
+    @if (Model?.Success.HasValue == true)
+    {
+        <div>
+            @if (Model.Success.Value)
+            {
+                <p>Transfer successful!</p>
+            }
+            else
+            {
+                <p>Transfer failed.</p>
+            }
+        </div>
+    }
+</body>
+</html>

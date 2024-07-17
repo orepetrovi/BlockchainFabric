@@ -1,0 +1,125 @@
+﻿@using Utils
+@model BlockchainStateSummary
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain State</title>
+    <script>
+        // Refresh the page every 1 second
+        setInterval(function () {
+            window.location.reload();
+        }, 10000);
+        // Function to create a dropdown list of numbers and set the default value
+        function createNumberDropdown() {
+            const selectElement = document.getElementById('numberSelect');
+            const defaultValue = 0;
+
+            // Add options dynamically
+            for (let i = 0; i < @await HelperMethods.GetNodePartitionCount(); i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                if (i === defaultValue) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            }
+
+            // Set the default value in the cookie if not already set
+            if (!getCookie('partition')) {
+                setCookie('partition', defaultValue, 365);
+            } else {
+                selectElement.value = getCookie('partition');
+            }
+        }
+
+        // Function to save the selected value in a cookie
+        function savePartition() {
+            const selectElement = document.getElementById('numberSelect');
+            const selectedValue = selectElement.value;
+            setCookie('partition', selectedValue, 365);
+        }
+
+        // Function to set a cookie
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        // Function to get a cookie value by name
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1, c.length);
+                }
+                if (c.indexOf(nameEQ) == 0) {
+                    return c.substring(nameEQ.length, c.length);
+                }
+            }
+            return null;
+        }
+
+        // Initialize the dropdown on page load
+        window.onload = createNumberDropdown;
+    </script>
+</head>
+<body>
+    <h1>Blockchain State</h1>
+
+    <label for="numberSelect">Choose a partition:</label>
+    <select id="numberSelect" onchange="savePartition()">
+        <!-- Options will be added dynamically by JavaScript -->
+    </select>
+
+    <p><strong>Current Block Hash:</strong> @Model.CurrentBlockHash</p>
+    <p><strong>Current Difficulty:</strong> @Model.CurrentDifficulty</p>
+    <p><strong>Number Of Blocks:</strong> @Model.NumberOfBlocks</p>
+
+    <h2>Top 5 Accounts with Most Amounts</h2>
+    <ul>
+        @if (Model.TopAccounts != null)
+        {
+            @foreach (var account in Model.TopAccounts)
+            {
+                <li>@account.Key: @account.Value</li>
+            }
+        }
+    </ul>
+
+    <h2>Estimated Hashes Per Second for Each Miner</h2>
+    <ul>
+        @if (Model.MinerHashRates != null)
+        {
+            @foreach (var miner in Model.MinerHashRates)
+            {
+                <li>@miner.Key: @miner.Value H/s</li>
+            }
+        }
+    </ul>
+
+    <h2>Last 5 Blocks</h2>
+    <ul>
+        @if (Model.LastBlocks != null)
+        {
+            @foreach (var block in Model.LastBlocks)
+            {
+                <li>
+                    <strong>Block Number:</strong> @block.number<br />
+                    <strong>Miner:</strong> @block.miner<br />
+                    <strong>Hash:</strong> @block.GetHash()<br />
+                    <strong>Parent Hash:</strong> @block.parentHash<br />
+                    <strong>Mined Time:</strong> @block.minedTime<br />
+                </li>
+            }
+        }
+    </ul>
+
+</body>
+</html>

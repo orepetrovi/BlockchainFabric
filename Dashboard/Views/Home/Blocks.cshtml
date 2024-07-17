@@ -1,0 +1,59 @@
+﻿@using Utils.Structs
+@model Dictionary<long, Block>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blocks</title>
+    <script>
+        // Refresh the page every 1 second
+        setInterval(function () {
+            window.location.reload();
+        }, 10000);
+    </script>
+    <style>
+        .block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .tx {
+            border: 1px solid #eee;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blocks</h1>
+    @foreach (var kvp in Model.OrderByDescending(kvp => kvp.Key))
+    {
+        var blockNumber = kvp.Key;
+        var block = kvp.Value;
+        <div class="block">
+            <h2>Block Number: @blockNumber</h2>
+            <p><strong>Parent Hash:</strong> @block.parentHash</p>
+            <p><strong>Miner:</strong> @block.miner</p>
+            <p><strong>Offset:</strong> @block.offset</p>
+            <p><strong>Mined Time:</strong> @block.minedTime</p>
+            <h3>Transactions</h3>
+            @if (block.txs.Count == 0)
+            {
+                <p>No Transactions</p>
+            } else
+            {
+                @foreach (var tx in block.txs)
+                {
+                    <div class="tx">
+                        <p><strong>From:</strong> @tx.from</p>
+                        <p><strong>To:</strong> @tx.to</p>
+                        <p><strong>Amount:</strong> @tx.amount</p>
+                        <p><strong>ID:</strong> @tx.id</p>
+                    </div>
+                }
+            }
+        </div>
+    }
+</body>
+</html>
